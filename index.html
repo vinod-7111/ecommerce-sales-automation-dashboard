@@ -211,8 +211,7 @@ for (let offset = 0; offset < 10000; offset += pageSize) {
       data.reduce((sum, row) =>
         sum + Number(row.profit || 0), 0);
 
-    const totalOrders =
-      new Set(data.map(row => row.order_id)).size;
+    const totalOrders = data.length;
 
     const avgMargin =
       data.reduce((sum, row) =>
