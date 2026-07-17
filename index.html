@@ -162,28 +162,41 @@ const SUPABASE_KEY =
 async function loadDashboard() {
 
   try {
+    
 
+    let data = [];
+const pageSize = 1000;
+
+for (let offset = 0; offset < 10000; offset += pageSize) {
     const response = await fetch(SUPABASE_URL, {
-      headers: {
-        "apikey": SUPABASE_KEY,
-        "Authorization": "Bearer " + SUPABASE_KEY
-      }
+        headers: {
+            "apikey": SUPABASE_KEY,
+            "Authorization": "Bearer " + SUPABASE_KEY,
+            "Range": `${offset}-${offset + pageSize - 1}`
+        }
     });
 
     if (!response.ok) {
-      throw new Error(
-        "Supabase request failed: " +
-        response.status +
-        " " +
-        response.statusText
-      );
+        throw new Error(
+            "Supabase request failed: " +
+            response.status +
+            " " +
+            response.statusText
+        );
     }
 
-    const data = await response.json();
+    const pageData = await response.json();
 
+    if (pageData.length === 0) break;
+
+    data = data.concat(pageData);
+
+    if (pageData.length < pageSize) break;
+}
     if (!Array.isArray(data) || data.length === 0) {
-      throw new Error("No data returned from Supabase.");
-    }
+    throw new Error("No data returned from Supabase.");
+}
+
 
     document.getElementById("status").innerText =
       "Dashboard updated: " + new Date().toLocaleString();
