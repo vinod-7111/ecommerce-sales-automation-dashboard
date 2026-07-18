@@ -1,0 +1,417 @@
+{
+  "name": "E-commerce Sales Automation",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -48,
+        -128
+      ],
+      "id": "943ab915-06c9-455f-8f17-c02db677eaf0",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "1sSMZGo8jaqehV25c1I0iTYtPY9PKl6iT",
+          "mode": "list",
+          "cachedResultName": "ecommerce_sales_10000.xlsx",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1sSMZGo8jaqehV25c1I0iTYtPY9PKl6iT/edit?usp=drivesdk&ouid=108733469001532699822&rtpof=true&sd=true"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        240,
+        0
+      ],
+      "id": "01abf6e3-0595-4b07-8c83-205a5e0e51d2",
+      "name": "Download file",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "I0WN5ENe32wiZCJ9",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "xlsx",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1.1,
+      "position": [
+        416,
+        0
+      ],
+      "id": "de6e3018-e9a7-43f2-bc31-32f42d31f0b2",
+      "name": "Extract from File"
+    },
+    {
+      "parameters": {
+        "language": "pythonNative",
+        "pythonCode": "output = []\n\nfor item in _items:\n    row = item[\"json\"]\n\n    # Convert numeric fields safely\n    sales = float(row.get(\"Sales\", 0) or 0)\n    cost = float(row.get(\"Cost\", 0) or 0)\n    profit = float(row.get(\"Profit\", 0) or 0)\n\n    # Calculate profit margin\n    if sales != 0:\n        profit_margin = round((profit / sales) * 100, 2)\n    else:\n        profit_margin = 0\n\n    # Add calculated fields\n    row[\"Profit_Margin\"] = profit_margin\n\n    # Classify profitability\n    if profit_margin >= 30:\n        row[\"Profit_Level\"] = \"High\"\n    elif profit_margin >= 15:\n        row[\"Profit_Level\"] = \"Medium\"\n    else:\n        row[\"Profit_Level\"] = \"Low\"\n\n    # Basic validation\n    if not row.get(\"Order_ID\"):\n        row[\"Data_Status\"] = \"Invalid\"\n    elif sales < 0 or cost < 0:\n        row[\"Data_Status\"] = \"Invalid\"\n    else:\n        row[\"Data_Status\"] = \"Valid\"\n\n    output.append({\"json\": row})\n\nreturn output"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        624,
+        0
+      ],
+      "id": "437173cc-f6f0-48f5-852d-7af6bfbad0d2",
+      "name": "Code in Python"
+    },
+    {
+      "parameters": {
+        "operation": "upsert",
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "ecommerce_sales",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "order_id": "={{ $json. Order_ID }}",
+            "customer_id": "={{ $json. Customer_ID }}",
+            "customer_name": "= {{ $json.Customer_Name }}",
+            "city": "={{ $json.City }}",
+            "state": "={{ $json.State }}",
+            "category": "={{ $json.Category }}",
+            "product": "={{ $json.Product }}",
+            "quantity": "={{ $json.Quantity }}",
+            "unit_price": "= {{ $json.Unit_Price }}",
+            "discount_percent": "={{ $json. Discount_Percent }}",
+            "sales": "={{ $json.Sales }}",
+            "cost": "={{ $json.Cost }}",
+            "profit": "={{ $json.Profit }}",
+            "payment_method": "={{ $json.Payment_Method }}",
+            "order_status": "={{ $json. Order_Status }}",
+            "profit_margin": "={{ $json. Profit_Margin }}",
+            "profit_level": "={{ $json. Profit_Level }}",
+            "data_status": "={{ $json.Data_Status }}",
+            "order_date": "={{ $json. Order_Date }}"
+          },
+          "matchingColumns": [
+            "order_id"
+          ],
+          "schema": [
+            {
+              "id": "order_id",
+              "displayName": "order_id",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "order_date",
+              "displayName": "order_date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": false,
+              "removed": false
+            },
+            {
+              "id": "customer_id",
+              "displayName": "customer_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false,
+              "removed": false
+            },
+            {
+              "id": "customer_name",
+              "displayName": "customer_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false,
+              "removed": false
+            },
+            {
+              "id": "city",
+              "displayName": "city",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false,
+              "removed": false
+            },
+            {
+              "id": "state",
+              "displayName": "state",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false,
+              "removed": false
+            },
+            {
+              "id": "category",
+              "displayName": "category",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false,
+              "removed": false
+            },
+            {
+              "id": "product",
+              "displayName": "product",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false,
+              "removed": false
+            },
+            {
+              "id": "quantity",
+              "displayName": "quantity",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": false,
+              "removed": false
+            },
+            {
+              "id": "unit_price",
+              "displayName": "unit_price",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": false,
+              "removed": false
+            },
+            {
+              "id": "discount_percent",
+              "displayName": "discount_percent",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": false,
+              "removed": false
+            },
+            {
+              "id": "sales",
+              "displayName": "sales",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": false,
+              "removed": false
+            },
+            {
+              "id": "cost",
+              "displayName": "cost",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": false,
+              "removed": false
+            },
+            {
+              "id": "profit",
+              "displayName": "profit",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": false,
+              "removed": false
+            },
+            {
+              "id": "payment_method",
+              "displayName": "payment_method",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false,
+              "removed": false
+            },
+            {
+              "id": "order_status",
+              "displayName": "order_status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false,
+              "removed": false
+            },
+            {
+              "id": "profit_margin",
+              "displayName": "profit_margin",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": false,
+              "removed": false
+            },
+            {
+              "id": "profit_level",
+              "displayName": "profit_level",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false,
+              "removed": false
+            },
+            {
+              "id": "data_status",
+              "displayName": "data_status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        832,
+        0
+      ],
+      "id": "18c3adc2-1961-4e0f-8151-6e98247eec1e",
+      "name": "Insert or update rows in a table",
+      "credentials": {
+        "postgres": {
+          "id": "qEyWbRqP9ntZY8Z4",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 9
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -48,
+        128
+      ],
+      "id": "fd1d0dbe-56d2-40f2-b076-d0a8e7e5fc28",
+      "name": "Schedule Trigger"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Download file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download file": {
+      "main": [
+        [
+          {
+            "node": "Extract from File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File": {
+      "main": [
+        [
+          {
+            "node": "Code in Python",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in Python": {
+      "main": [
+        [
+          {
+            "node": "Insert or update rows in a table",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Download file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false,
+    "timeSavedMode": "fixed",
+    "errorWorkflow": "hMWmgkvFz8Q5yUkZ",
+    "callerPolicy": "workflowsFromSameOwner",
+    "timezone": "Asia/Kolkata"
+  },
+  "versionId": "788e4361-9b93-4c51-a98a-50496c007fdc",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "2c81efb22c99e5c9bef1378417b42f520d361f72f4b46da57ef741f0c30971c5"
+  },
+  "nodeGroups": [],
+  "id": "O7irdHba6cmusMHU",
+  "tags": []
+}
