@@ -167,7 +167,7 @@ async function loadDashboard() {
     let data = [];
 const pageSize = 1000;
 
-for (let offset = 0; offset < 10000; offset += pageSize) {
+for (let offset = 0; ; offset += pageSize) {
     const response = await fetch(SUPABASE_URL, {
         headers: {
             "apikey": SUPABASE_KEY,
