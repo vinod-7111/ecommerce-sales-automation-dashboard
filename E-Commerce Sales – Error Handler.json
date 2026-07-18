@@ -1,0 +1,67 @@
+{
+  "name": "E-Commerce Sales – Error Handler",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.errorTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "802a9848-0a00-40a1-bd40-c2b3afa212f7",
+      "name": "Error Trigger"
+    },
+    {
+      "parameters": {
+        "sendTo": "justinbieber6305@gmail.com",
+        "subject": "E-Commerce Automation Failed",
+        "message": "=<h2>E-Commerce Sales Automation Failed</h2>  <p><b>Workflow:</b> {{ $json.workflow.name }}</p> <p><b>Failed Node:</b> {{ $json.execution.lastNodeExecuted }}</p> <p><b>Error:</b> {{ $json.execution.error.message }}</p> <p><b>Execution:</b> {{ $json.execution.url }}</p>  <p>Please check the n8n workflow and fix the issue.</p>",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        208,
+        0
+      ],
+      "id": "2e27fa50-682d-49ef-880c-8ffa449e51c4",
+      "name": "Send a message",
+      "webhookId": "762a9487-b221-4189-a1f9-064cf311887d",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "FTnnURc9kmzC5DAW",
+          "name": "Gmail account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Error Trigger": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "048eeb65-c54d-4fb8-818b-a4624025bdaf",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "2c81efb22c99e5c9bef1378417b42f520d361f72f4b46da57ef741f0c30971c5"
+  },
+  "nodeGroups": [],
+  "id": "hMWmgkvFz8Q5yUkZ",
+  "tags": []
+}
