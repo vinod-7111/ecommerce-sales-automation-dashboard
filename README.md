@@ -10,6 +10,7 @@ The workflow automatically retrieves an Excel dataset, extracts and processes th
 
 ## Project Architecture
 
+```text
 Excel / Google Drive
         ↓
 n8n Schedule Trigger
@@ -29,6 +30,7 @@ If Workflow Fails:
 n8n Error Trigger
         ↓
 Gmail Error Notification
+```
 
 ## Technologies Used
 
