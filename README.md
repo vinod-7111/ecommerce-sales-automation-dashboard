@@ -73,6 +73,24 @@ A separate n8n Error Handler workflow monitors automation failures.
 
 If the main workflow fails, the Error Trigger activates and sends an email notification containing information about the failed workflow and error.
 
+## Project Screenshots
+
+### n8n Automation Workflow
+
+![n8n Automation Workflow](n8n-workflow.png)
+
+### Supabase Database
+
+![Supabase E-Commerce Sales Table](supabase-table.png)
+
+### E-Commerce Sales Dashboard
+
+![E-Commerce Sales Automation Dashboard](dashboard.png)
+
+### n8n Error Handler
+
+![n8n Error Handler Workflow](error-handler.png)
+
 ## Project Result
 
 The project creates an automated pipeline where new or updated sales data can flow from the source dataset to the database and analytics dashboard with minimal manual intervention.
